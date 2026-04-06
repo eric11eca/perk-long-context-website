@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="4M: Massively Multimodal Masked Modeling">
+  <meta name="keywords" content="4M, Foundation Model, Frontier Model, MultiMAE, Masked Autoencoders,
+                                 Multimodal Learning, Multitask Learning,
+                                 Multi-modal Learning, Multi-task Learning,
+                                 Generative Modeling, Transfer Learning, Vision Transformers,
+                                 Computer Vision, Vision">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PERK: Long-Context Reasoning as Test-Time Learning</title>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GBVBTHC8QT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-GBVBTHC8QT');
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+
+  <!-- For metadata visualizations -->
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="https://unpkg.com/crossfilter@1.3.11/crossfilter.js"></script>
+  <script src="./static/js/metadata_designer.js" defer></script>
+
+  <script src="./static/js/index.js"></script>
+
+</head>
+<body>
+  <nav class="navbar is-transparent is-fixed-top glass-overlay" role="navigation" aria-label="main navigation" id="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        Home
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div class="navbar-menu" id="navMenu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="#about">
+          Overview
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#publications">
+            Papers & code
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#fourm_paper">
+              4M (NeurIPS 2023)
+            </a>
+            <a class="navbar-item" href="#fourm21_paper">
+              4M-21 (NeurIPS 2024)
+            </a>
+
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#method">
+            Method
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#training">
+              Training
+            </a>
+            <a class="navbar-item" href="#chained-generation">
+              Generation
+            </a>
+            <a class="navbar-item" href="#modalities">
+              Modalities
+            </a>
+            <a class="navbar-item" href="#tokenization">
+              Tokenization
+            </a>
+
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#generation">
+            Generation
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#any-to-any">
+              Any-to-any generation
+            </a>
+            <a class="navbar-item" href="#rgb-to-all">
+              RGB-to-all generation
+            </a>
+            <a class="navbar-item" href="#fine-grained-generation-editing">
+              Fine-grained generation & editing
+            </a>
+            <!-- <a class="navbar-item" href="#semantic-editing">
+              Semantic editing
+            </a> -->
+            <a class="navbar-item" href="#multimodal-guidance">
+              Multimodal guidance
+            </a>
+            <a class="navbar-item" href="#steerable-generation">
+              Steerable data generation
+            </a>
+            <a class="navbar-item" href="#text-understanding">
+              Improved text understanding
+            </a>
+
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#retrieval">
+            Retrieval
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#any2rgb-retrieval">
+              Any-to-RGB retrieval
+            </a>
+            <a class="navbar-item" href="#rgb2any-retrieval">
+              RGB-to-any retrieval
+            </a>
+
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#out-of-the-box">
+            Out-of-the-box evaluations
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#quantitative-results">
+              Quantitative results
+            </a>
+            <a class="navbar-item" href="#visuals">
+              Visual comparison
+            </a>
+
+          </div>
+        </div>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#transfers-ablations">
+            Transfers & ablations
+          </a>
+
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="#unimodal-transfers">
+              Unimodal transfers
+            </a>
+            <a class="navbar-item" href="#multimodal-transfers">
+              Multimodal transfers
+            </a>
+            <a class="navbar-item" href="#ablations">
+              Ablations
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </nav>
+
+<section class="hero headline">
+
+  <div class="hero-body">
+
+    <div class="container is-max-desktop headline-container">
+
+      <div class="columns is-centered">
+
+        <div class="column has-text-left">
+          <div class="title-container">
+            <!-- <img src="static/images/4M_logo_bw.svg" class="logo" width="100" alt="4M logo"/> -->
+            <h1 id="scrollingHead" class="title is-1 publication-title">PERK: Long-Context Reasoning<br>as Test-Time Learning</h1>
+          </div>
+        </div>
+
+        <div class="logo-container">
+          <img src="static/images/EPFL_logo.png" class="logo" width="140" alt="EPFL logo"/>
+          <!-- <img src="static/images/Apple_logo.png" class="logo apple-logo" width="60" alt="Apple logo"/> -->
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column has-text-left banner">
+          <blockquote>
+            A scalable meta-learning method that learns to encode long contexts through gradient updates<br>to a model adapter at test time,
+            achieving long-context reasoning robust to complexity and length extrapolation while scaling more efficiently at inference.
+          </blockquote>
+        </div>
+      </div>
+
+      <div class="column has-text-justified">
+        <div class="publication-links">
+          <!-- PDF Link. Neurips-->
+          <span class="link-block-header">
+            <a href="https://arxiv.org/abs/2305.06349"
+              target="_blank" class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                  <i class="ai ai-arxiv"></i>
+              </span>
+              <span><span class="dmethod">RECKONING</span> Paper (NeurIPS 2023)</span>
+            </a>
+          </span>
+          <!-- PDF Link. Arxiv-->
+          <span class="link-block-header">
+            <a href="https://arxiv.org/abs/2406.09406"
+              target="_blank" class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                  <i class="ai ai-arxiv"></i>
+              </span>
+              <span><span class="dmethod">PERK</span> Paper (Arxiv 2025)</span>
+            </a>
+          </span>
+          <!-- Code Link. -->
+          <span class="link-block-header">
+            <a href="https://github.com/eric11eca/ml-4m/" target="_blank" class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                  <i class="fab fa-github"></i>
+              </span>
+              <span>Code & weights</span>
+            </a>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="./static/images/perk_inference.png" alt="PERK inference figure."/><br>
+      <h2 class="subtitle has-text-centered">
+        <span class="dmethod">PERK</span> models simulate reasoning by first encoding
+        a given long context into its parameters through a few gradient steps,
+        and then using the updated parameters to generate a response to a given query.
+        The long context is formulated as a batch of segment-level sequences that are encoded in parallel by adapting the model's parameters
+        through backpropagation, using a Causal Language Modeling (CLM) objective over the context.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" id="about">Summary</h2>
+        <div class="content has-text-justified">
+
+          <p>
+            Long-context reasoning requires accurately identifying relevant information in extensive, noisy input contexts.
+            Previous research shows that using test-time learning to encode context directly into model parameters can
+            effectively enable reasoning over noisy information.
+            However, meta-learning methods for enabling test-time learning are prohibitively memory-intensive,
+            preventing their application to long context settings.
+          </p>
+
+          <p>
+            In this work, we propose <span class="dmethod">PERK</span>
+            (<strong>P</strong>arameter <strong>E</strong>fficient <strong>R</strong>easoning over <strong>K</strong>nowledge),
+            a scalable approach for learning to encode long input contexts using gradient updates to a lightweight model adapter at test time.
+            Specifically, <span class="dmethod">PERK</span> employs two nested optimization loops in a meta-training phase.
+            The inner loop rapidly encodes contexts into a low-rank adapter (LoRA) that serves as a parameter-efficient memory module for the base model.
+            Concurrently, the outer loop learns to use the updated adapter to accurately recall and reason over relevant information from the encoded long context.
+          </p>
+
+          <p>
+            Our evaluations on several long-context reasoning tasks show that <span class="dmethod">PERK</span> significantly outperforms the standard prompt-based long-context baseline,
+            achieving average absolute performance gains of up to 90% for smaller models (GPT-2) and up to 27% for our largest evaluated model, Qwen-2.5-0.5B.
+            In general, <span class="dmethod">PERK</span> is more robust to reasoning complexity, length extrapolation, and the locations of relevant information in contexts.
+            Finally, we show that while <span class="dmethod">PERK</span> is memory-intensive during training, it scales more efficiently at inference time than prompt-based long-context inference.
+          </p>
+
+          <p>
+            Through experimental analyses, we demonstrate the potential of <span class="dmethod">4M</span> for
+            training versatile and scalable foundation models for vision tasks, setting the stage for further
+            exploration in multimodal learning for vision and other domains. Please see our
+            <a href="https://github.com/apple/ml-4m/" target="_blank">
+              <span class="dlink">GitHub repository</span>
+            </a>
+            for code and pre-trained models.
+          </p>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <a class="anchor" id="publications"></a>
+        <!-- <h2 class="title is-3">Papers & code</h2> -->
+
+        <!-- Publication tiles. -->
+        <!-- div class="tile is-ancestor is-centered">
+          <div class="tile is-parent is-12">
+            <a class="anchor" id="fourm_paper"></a>
+            <article class="tile is-child box">
+              <p class="title is-4">4M: Massively Multimodal Masked Modeling</p>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">
+                  <a href="https://dmizrahi.com/" target="_blank">David Mizrahi</a> <sup>1,2 *</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://roman-bachmann.github.io/" target="_blank">Roman Bachmann</a> <sup>1 *</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://ofkar.github.io/" target="_blank">Oğuzhan Fatih Kar</a> <sup>1</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://aserety.github.io/" target="_blank">Teresa Yeo</a> <sup>1</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://fly6464.github.io/" target="_blank">Mingfei Gao</a> <sup>2</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://www.afshindehghan.com/" target="_blank">Afshin Dehghan</a> <sup>2</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://vilab.epfl.ch/zamir/" target="_blank">Amir Zamir</a> <sup>1</sup>
+                </span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>EPFL</span>
+                &nbsp;
+                <span class="author-block"><sup>2</sup>Apple</span>
+              </div>
+
+              <div class="is-size-6 publication-contribution">
+                <span class="author-block">* Equal contribution</span>
+              </div>
+
+              <div class="is-size-5 has-text-weight-semibold mt-3 publication-title">
+                <span class="author-block">NeurIPS 2023 (spotlight)</span>
+              </div>
+
+              <br>
+
+              <p>
+                This paper introduces the <span class="dmethod">4M</span> framework for training
+                multimodal and multitask models and applies it to a diverse set of tokenized modalities
+                including text, images, geometric, and semantic modalities, as well as neural network
+                feature maps. We investigate the capabilities of <span class="dmethod">4M</span> models
+                through a series of transfer experiments, and study key design choices in an extensive ablation.
+              </p>
+
+              <br>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <-- PDF Link. ->
+                  <span class="link-block">
+                    <a href="https://arxiv.org/abs/2312.06647"
+                      target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="ai ai-arxiv"></i>
+                      </span>
+                      <span>Paper</span>
+                    </a>
+                  </span>
+                  <-- Code Link. ->
+                  <span class="link-block">
+                    <a href="https://github.com/apple/ml-4m/" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fab fa-github"></i>
+                      </span>
+                      <span>Code & weights</span>
+                      </a>
+                  </span>
+                  <-- Poster ->
+                  <span class="link-block">
+                    <a href="https://storage.googleapis.com/four_m_site/presentation/4M_Poster_NeurIPS.pdf"
+                       target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="far fa-sticky-note"></i>
+                      </span>
+                      <span>Poster</span>
+                      </a>
+                  </span>
+                  <-- Slides (Keynote) ->
+                  <span class="link-block">
+                    <a href="https://storage.googleapis.com/four_m_site/presentation/4M_Slides_NeurIPS.key"
+                       target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fas fa-file-powerpoint"></i>
+                      </span>
+                      <span>Slides (Keynote)</span>
+                      </a>
+                  </span>
+
+                  <-- BibTeX ->
+                  <div id="modal-js-example" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                      <div class="box">
+                        <h2 class="title">BibTeX</h2>
+                          <pre style="text-align: left;"><code>@inproceedings{4m,
+  title={{4M}: Massively Multimodal Masked Modeling},
+  author={Mizrahi, David and Bachmann, Roman and Kar, O{\u{g}}uzhan Fatih and Yeo, Teresa and Gao, Mingfei and Dehghan, Afshin and Zamir, Amir},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2023}
+}</code></pre>
+                      </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close"></button>
+                  </div>
+                  <span class="link-block">
+                    <a target="_blank" class="external-link button is-normal is-rounded is-dark js-modal-trigger"
+                       data-target="modal-js-example">
+                      <span class="icon">
+                          <i class="fas fa-newspaper"></i>
+                      </span>
+                      <span>BibTeX</span>
+                      </a>
+                  </span>
+
+                </div>
+              </div>
+
+              <br>
+
+              <div class="intro-video-container">
+                <-- Introductory video ->
+                <video id="teaser" controls="controls" height="100%" width="100%" preload="metadata">
+                  <source src="https://storage.googleapis.com/four_m_site/videos/4M_Website_Video.mp4#t=0.1"
+                          type="video/mp4">
+                </video>
+                <h2 class="subtitle has-text-centered">
+                  Introductory video (6min) <i class="fa fa-volume-up"></i>.
+                </h2>
+              </div>
+
+            </article>
+          </div>
+          <--/ NeurIPS ->
+        </div> -->
+
+        <div class="tile is-ancestor is-centered">
+          <!-- Arxiv -->
+          <div class="tile is-parent is-12">
+            <a class="anchor" id="fourm21_paper"></a>
+            <article class="tile is-child box">
+              <p class="title is-4">PERK: Long-Context Reasoning as Test-Time Learning</p>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">
+                  <a href="https://eric11eca.github.io/" target="_blank">Zeming Chen</a> <sup>1</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://agromanou.github.io/" target="_blank">Angelika Romanou</a> <sup>1</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://gailweiss.github.io/" target="_blank">Gail Weiss</a> <sup>2</sup>,
+                </span>
+                <span class="author-block">
+                  <a href="https://atcbosselut.github.io/" target="_blank">Antoine Bosselut</a> <sup>1</sup>
+                </span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>EPFL</span>
+              </div>
+
+              <div class="is-size-5 has-text-weight-semibold mt-3 publication-title">
+                <span class="author-block">ArXiv Preprint 2025</span>
+              </div>
+
+              <br>
+              <p></p>
+              <br>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <!-- PDF Link. -->
+                  <span class="link-block">
+                    <a href="https://arxiv.org/abs/2406.09406" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="ai ai-arxiv"></i>
+                      </span>
+                      <span>Paper</span>
+                    </a>
+                  </span>
+                  <!-- Code Link. -->
+                  <span class="link-block">
+                    <a href="https://github.com/apple/ml-4m/" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fab fa-github"></i>
+                      </span>
+                      <span>Code & weights</span>
+                      </a>
+                  </span>
+                  <!-- Poster -->
+                  <span class="link-block">
+                    <a href="https://storage.googleapis.com/four_m_site/presentation/4M-21_Poster.pdf" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="far fa-sticky-note"></i>
+                      </span>
+                      <span>Poster</span>
+                      </a>
+                  </span>
+                  <!-- Slides (Keynote) -->
+                  <span class="link-block">
+                    <a href="https://storage.googleapis.com/four_m_site/presentation/4M-21_Slides.key" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fas fa-file-powerpoint"></i>
+                      </span>
+                      <span>Slides (Keynote)</span>
+                      </a>
+                  </span>
+
+                  <!-- BibTeX -->
+                  <div id="modal-js-example-21" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                      <div class="box">
+                        <h2 class="title">BibTeX</h2>
+                          <pre style="text-align: left;"><code>@article{4m21,
+    title={{4M-21}: An Any-to-Any Vision Model for Tens of Tasks and Modalities},
+    author={Roman Bachmann and O{\u{g}}uzhan Fatih Kar and David Mizrahi and Ali Garjani and Mingfei Gao and David Griffiths and Jiaming Hu and Afshin Dehghan and Amir Zamir},
+    journal={arXiv 2024},
+    year={2024},
+}</code></pre>
+                      </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close"></button>
+                  </div>
+                  <span class="link-block">
+                    <a target="_blank" class="external-link button is-normal is-rounded is-dark js-modal-trigger"
+                       data-target="modal-js-example-21">
+                      <span class="icon">
+                          <i class="fas fa-newspaper"></i>
+                      </span>
+                      <span>BibTeX</span>
+                      </a>
+                  </span>
+
+                </div>
+              </div>
+
+              <br>
+
+              <div class="intro-video-container">
+                <!-- Introductory video -->
+                <!-- <video id="teaser" controls="controls" height="100%" width="100%" preload="metadata">
+                  <source src="https://storage.googleapis.com/four_m_site/videos/4M-21_Website_Video.mp4#t=0.1"
+                          type="video/mp4">
+                </video>
+                <h2 class="subtitle has-text-centered">
+                  Introductory video (15min) <i class="fa fa-volume-up"></i>.
+                </h2> -->
+                <!--/ Introductory video -->
+              </div>
+
+            </article>
+          </div>
+          <!--/ Arxiv -->
+        </div>
+
+        <!--/ Publication tiles. -->
+
+      </div>
+    </div>
+
+    <!-- Overview. -->
+    <div class="extended-container columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">Overview</h2>
+
+        <div class="tile is-ancestor is-centered">
+
+          <div class="tile is-parent">
+            <a href="#method" class="tile is-child box asdf">
+              <p class="title is-5">Parameter-efficient Meta-Learning with <span class="dmethod">PERK</span></p>
+              <p>
+                Discover <span class="dmethod">PERK</span>&apos;s meta-learning algorithm for long-context reasoning.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#long-context-eval" class="tile is-child box">
+              <p class="title is-5">Long-Context Reasoning</p>
+              <p>
+                Check out <span class="dmethod">PERK</span>&apos;s performance on a variety of long-context reasoning benchmarks.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#length-extrapolation" class="tile is-child box">
+              <p class="title is-5">Test-Time Length Extrapolation</p>
+              <p>
+                Check out <span class="dmethod">PERK</span>&apos;s ability to extrapolate reasoning to test-time contexts that arelonger than the training samples.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#transfers-ablations" class="tile is-child box">
+              <p class="title is-5">Transfers & ablations</p>
+              <p>
+                Explore key design choices and how <span class="dmethod">4M</span>
+                transfers to novel downstream tasks.
+              </p>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <!--/ Overview. -->
+
+  </div>
+</section>
+
+
+<!-- PERK method description, optimization & learning objectives. -->
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <!-- PERK training and optimization. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="method"></a>
+        <h2 class="title is-3"><span class="dmethod">PERK</span> method overview</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            To scale the training of larger and more capable test-time learning models,
+            we propose <span class="dmethod">PERK</span>,
+            which uses a parameter-efficient test-time adaptation to reduce
+            both the size and amount of gradient unrolling required during optimization.
+            Specifically, in the inner and outer loops,
+            we only optimize a parameter-efficient adapter,
+            <strong>LoRA</strong>, to encode the contexts, and we apply <i>truncated gradient unrolling</i>
+            to reduce the memory cost of backpropagating through the inner loop.
+          </p>
+        </div>
+
+        <a class="anchor" id="training"></a>
+        <h2 class="title is-4">Test-Time Learning and Inner Loop Training</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We set the test time learning objective (thus also the inner loop objective) to Causal Language Modeling (CLM) of the context,
+            and set the adaptation algorithm <i>Alg</i> to only update the LoRA parameters.
+            The adaptation algorithm computes the gradients on a batch of sub-sequences from the full context sequence.
+            This compression as a parallel <i>batch</i>(or multiple batches) allows us to process lengthy sequences
+            beyond the model&apos;s context window.
+          </p>
+        </div>
+
+        <div class="hero-body">
+
+            <img src="./static/images/perk_training.png" alt="PERK train figure."/><br><br>
+            <h2 class="subtitle has-text-centered">
+                <span class="dmethod">Meta-learning PERK for long-context reasoning:</span>
+                The training procedure involves a nested inner and outer loop.
+                The inner loop optimizes the likelihood of a batch of long context segments with respect to the parameters of the LoRA-based memory scratchpad.
+                In the outer loop, the model uses the encoded information in the memory scratchpad to answer questions.
+                In both cases, only the memory scratchpad parameters are updated while the base LLM parameters are frozen.
+            </h2>
+
+          <!-- <div class="field has-addons is-pulled-right" id="play-controls"
+               title="Hint: Right click the video and choose 'Show All Controls' to enable more fine-grained video controls.">
+            <p class="control">
+              <button class="button is-small is-rounded" onclick="playPauseVideo('pullFigVideo')">
+                <span class="icon is-small">
+                  &nbsp;<i class="fa fa-play"></i>&nbsp;<i class="fa fa-pause"></i>&nbsp;
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button class="button is-small is-rounded" onclick="restartVideo('pullFigVideo')">
+                <span class="icon is-small">
+                  <i class="fas fa-redo"></i>
+                </span>
+                <span>Restart animation</span>
+              </button>
+            </p>
+          </div> -->
+
+          <!-- <video id="pullFigVideo" height="100%" width="100%" preload="metadata"
+                 title="Hint: Right click the video and choose 'Show All Controls' to enable more fine-grained video controls.">
+            <source src="https://storage.googleapis.com/four_m_site/videos/4M_method_figure.mp4#t=25.9"
+                    type="video/mp4">
+          </video> -->
+
+          <!-- <h2 class="subtitle has-text-centered"></h2> -->
+
+        </div>
+
+        <a class="anchor" id="chained-generation"></a>
+        <h2 class="title is-4">Outer Loop Training</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            In the outer loop, we optimize the meta parameters of the LoRA module to learn from
+            the corresponding distribution of reasoning problems.
+            The optimal meta parameters minimize the expected reasoning loss of the adapter&apos;s adaptation to each reasoning problem,
+            where the adaptation here is the parameter-efficient CLM adaptation of the LoRA meta parameters to the context.
+          </p>
+        </div>
+
+        <!-- <div class="hero-body">
+          <div class="field has-addons is-pulled-right" id="play-controls"
+               title="Hint: Right click the video and choose 'Show All Controls' to enable more fine-grained video controls.">
+            <p class="control">
+              <button class="button is-small is-rounded" onclick="playPauseVideo('chainGenVideo')">
+                <span class="icon is-small">
+                  &nbsp;<i class="fa fa-play"></i>&nbsp;<i class="fa fa-pause"></i>&nbsp;
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button class="button is-small is-rounded" onclick="restartVideo('chainGenVideo')">
+                <span class="icon is-small">
+                  <i class="fas fa-redo"></i>
+                </span>
+                <span>Restart animation</span>
+              </button>
+            </p>
+          </div>
+          <video id="chainGenVideo" height="100%" width="100%" preload="metadata"
+                 title="Hint: Right click the video and choose 'Show All Controls' to enable more fine-grained video controls.">
+            <source src="https://storage.googleapis.com/four_m_site/videos/4M_chained_generation.mp4#t=32.5"
+                    type="video/mp4">
+          </video>
+          <h2 class="subtitle has-text-centered"></h2>
+        </div> -->
+
+        <a class="anchor" id="tokenization"></a>
+        <h2 class="title is-4">Truncated Gradient Unrolling (TGU)</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            To optimize the outer loop objective with gradient-based methods,
+            we need to differentiate through the inner loop adaptation algorithm <i>Alg</i>,
+            which involves higher-order derivatives and saving the complete trajectory to compute the meta-gradient.
+            However, this creates high memory costs, capping the method&apos;s applicability.
+            To reduce memory costs, we truncate the backpropagation for the meta-gradient computation.
+          </p>
+        </div>
+
+      </div>
+    </div>
+    <!--/ 4M training and generation. -->
+
+  </div>
+</section>
+
+
+<!--/ Long-Context Reasoning Evaluation -->
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="long-context-eval"></a>
+        <h2 class="title is-3">Long-Context Reasoning Evaluation</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            <span class="dmethod">4M</span> demonstrates strong out-of-the-box capabilities across different tasks, often matching or surpassing the performance of the pseudo labelers and specialist baselines,
+            <em>while being a single model for all tasks</em>. The large performance gap with other multitask models like Unified-IO and Unified-IO-2 is notable.
+          </p>
+        </div>
+
+        <figure class="image tok-figure">
+            <img src="./static/images/perk_data_examples.png" alt="Tokenization overview">
+        </figure><br>
+        <h2 class="subtitle has-text-centered">
+            <strongDataset Examples.</strong> Here we show an example from the three datasets we used: (Top) BabiLong, (Middle) Student Records, and (Bottom) Lost-in-the-Middle API Retrieval.
+        </h2>
+
+        <figure class="image tok-figure">
+            <img src="./static/images/long_context_results.png" alt="Tokenization overview">
+        </figure><br>
+        <h2 class="subtitle has-text-centered">
+            <strong>Performance on NIAH with BabiLong and DIO with Student Records.</strong>
+            All models are trained and tested on sequences ranging from 1K to 8K tokens.
+            All <span class="dmethod">PERK</span> models are trained to first generate the supporting facts relevant to a query,
+            followed by the final answer prediction. In contrast, baseline models directly generate the answer,
+            as this approach yields better performance for them in this setting.
+            The number of trainable parameters for each method is indicated in the legend.
+        </h2>
+
+
+        <a class="anchor" id="babilong-niah-reasoning"></a>
+        <h2 class="title is-4">Reasoning on BabiLong and NIAH</h2>
+        <div class="content has-text-justified">
+          <p>
+            We evaluate <span class="dmethod">4M</span> out-of-the-box performance on a variety of tasks including surface normals and depth estimation on DIODE, semantic and instance segmentation on COCO, k-NN retrieval on ImageNet-1K, and 3D human keypoint estimation on 3DPW.
+            As demonstrated <span class="dmethod">4M-21</span> matches performance of <span class="dmethod">4M-7</span> on common tasks, while being able to solve <b>3x</b> more tasks and modalities. Note that <span class="dmethod">4M</span> also outperforms Unified-IO in both the number of modalities it supports and performance on various tasks.
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="table" align="center">
+            <thead>
+              <tr>
+                <th>Models</th>
+                <th class="has-text-centered">Normals ↓</th>
+                <th class="has-text-centered">Depth ↓</th>
+                <th class="has-text-centered">Sem. seg. ↑</th>
+                <th class="has-text-centered">Inst. seg. ↑</th>
+                <th class="has-text-centered">1N1k kNN ↑</th>
+                <th class="has-text-centered">3D human KP ↓</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="pseudo-selected clickable-row">
+                <td class="has-text-centered" colspan="7"><b class="dlink">Show pseudo labeler evaluations</b></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>Omnidata</td>
+                <td class="has-text-centered">22.5</td>
+                <td class="has-text-centered"><b>0.68</b></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>M2F-B</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">45.7</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>SAM</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><b>32.9</b></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>DINOV2-B14</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><b>82.1</b> / <u>93.9</u></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>ImageBind-H14</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><u>81.1</u> / <b>94.4</b></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="pseudo-selected expandable-content">
+                <td>4D-Humans</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><b>81.3</b></td>
+              </tr>
+              <tr>
+                <td>OASIS</td>
+                <td class="has-text-centered">34.3</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>MiDaS DPT</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">0.73</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>M2F-S</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">44.6</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>M2F-L</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><u>48.0</u></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>HMR</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">130.0</td>
+              </tr>
+
+              <tr>
+                <td>Unified-IO-B</td>
+                <td class="has-text-centered">35.7</td>
+                <td class="has-text-centered">1.00</td>
+                <td class="has-text-centered">32.9</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>Unified-IO-L</td>
+                <td class="has-text-centered">33.9</td>
+                <td class="has-text-centered">0.87</td>
+                <td class="has-text-centered">41.6</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>Unified-IO-XL</td>
+                <td class="has-text-centered">31.0</td>
+                <td class="has-text-centered">0.82</td>
+                <td class="has-text-centered">44.3</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+
+              <tr>
+                <td>Unified-IO 2-L</td>
+                <td class="has-text-centered">37.1</td>
+                <td class="has-text-centered">0.96</td>
+                <td class="has-text-centered">38.9</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr>
+                <td>Unified-IO 2-XL</td>
+                <td class="has-text-centered">34.8</td>
+                <td class="has-text-centered">0.86</td>
+                <td class="has-text-centered">39.7</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+
+              <tr>
+                <td>Unified-IO 2-XXL</td>
+                <td class="has-text-centered">37.4</td>
+                <td class="has-text-centered">0.84</td>
+                <td class="has-text-centered">41.7</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 B</span></td>
+                <td class="has-text-centered">21.9</td>
+                <td class="has-text-centered">0.71</td>
+                <td class="has-text-centered">43.3</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 B</span></td>
+                <td class="has-text-centered">21.7</td>
+                <td class="has-text-centered">0.71</td>
+                <td class="has-text-centered">42.5</td>
+                <td class="has-text-centered">15.9</td>
+                <td class="has-text-centered">73.1 / 89.7</td>
+                <td class="has-text-centered">108.3</td>
+              </tr>
+
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 L</span></td>
+                <td class="has-text-centered">21.5</td>
+                <td class="has-text-centered"><u>0.69</u></td>
+                <td class="has-text-centered">47.1</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 L</span></td>
+                <td class="has-text-centered">21.1</td>
+                <td class="has-text-centered"><u>0.69</u></td>
+                <td class="has-text-centered">46.4</td>
+                <td class="has-text-centered">31.2</td>
+                <td class="has-text-centered">77.0 / 91.9</td>
+                <td class="has-text-centered">97.4</td>
+              </tr>
+
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 XL</span></td>
+                <td class="has-text-centered"><b>20.6<b></td>
+                <td class="has-text-centered"><u>0.69</u></td>
+                <td class="has-text-centered"><b>48.1</b></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 XL</span></td>
+                <td class="has-text-centered"><u>20.8</u></td>
+                <td class="has-text-centered"><b>0.68</b></td>
+                <td class="has-text-centered"><b>48.1</b></td>
+                <td class="has-text-centered"><u>32.0</u></td>
+                <td class="has-text-centered">78.3 / 92.4</td>
+                <td class="has-text-centered"><u>92.0</u></td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+
+      <br/>
+
+      <a class="anchor" id="visuals"></a>
+      <h2 class="title is-4">Visual comparison</h2>
+      <h2 class="title is-5">Comparison with single task experts</h2>
+      <div class="content has-text-justified">
+        <p>
+          We further provide a visual comparison of <span class="dmethod">4M-21</span>&apos;s predictions with single task experts (pseudo labelers) across different tasks.
+          As demonstrated, <span class="dmethod">4M-21</span> is able to predict different modalities with a quality matching or surpassing the experts.
+        </p>
+      </div>
+
+    </div>
+
+</section>
+<!--/ Out-of-the-box -->
+
+<!-- Transfers -->
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="transfers-ablations"></a>
+        <h2 class="title is-3">Test-Time Length Extrapolation</h2>
+
+
+        <figure class="image mod-figure" style="width: 60%; margin: 0 auto;">
+            <img src="./static/images/length-generalization_updated.png" alt="test-time length extrapolation">
+        </figure><br>
+        <h2 class="subtitle has-text-centered">
+            <strong>Test-time context length generalization evaluation</strong> on BabiLong <strong>QA1 (a)</strong> and <strong>QA2 (b)</strong>
+            comparison between <span class="dmethod">PERK</span> and FT-ICR on the Qwen-2.5-0.5B model.
+            The y-axis represents the training context lengths, while the x-axis indicates various test-time context lengths.
+            We test for both <em>interpolation</em> (test lengths shorter than the training length) and <em>extrapolation</em>
+            (test lengths longer than the training length).
+            Bordered cells denote the boundary: evaluation on context lengths equal to those in training.
+        </h2>
+
+        <figure class="image mod-figure" style="width: 50%; margin: 0 auto;">
+            <img src="./static/images/positional_bias_v2.png" alt="positional bias">
+        </figure><br>
+        <h2 class="subtitle has-text-centered">
+            <strong>Test-time context length generalization evaluation</strong> on BabiLong <strong>QA1 (a)</strong> and <strong>QA2 (b)</strong>
+            comparison between <span class="dmethod">PERK</span> and FT-ICR on the Qwen-2.5-0.5B model.
+            The y-axis represents the training context lengths, while the x-axis indicates various test-time context lengths.
+            We test for both <em>interpolation</em> (test lengths shorter than the training length) and <em>extrapolation</em>
+            (test lengths longer than the training length).
+            Bordered cells denote the boundary: evaluation on context lengths equal to those in training.
+        </h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We perform an extensive set of ablations and transfer experiments to understand the
+            impact of different design choices of <span class="dmethod">4M</span> training and to
+            showcase its transfer capabilities. We show that <span class="dmethod">4M</span>
+            is a scalable and versatile training method that transfers well to a wide range of
+            downstream tasks.
+          </p>
+        </div>
+
+        <br/>
+
+        <a class="anchor" id="unimodal-transfers"></a>
+        <h3 class="title is-4">Unimodal transfers</h3>
+        <div class="content has-text-justified">
+          <p>
+            We transfer <span class="dmethod">4M</span> models of different sizes to ImageNet-1K classification,
+            COCO object detection and instance segmentation, ADE20K semantic segmentation, NYUv2 depth estimation, and ARKitScenes 3D object detection.
+            <span class="dmethod">4M</span> outperforms or stays competetive with the baselines on all tasks.
+            We observe that <span class="dmethod">4M-21</span> has no loss in performance for the transfer tasks that are similar to <span class="dmethod">4M-7</span>, while solving <b>3x</b> more tasks.
+            In contrast to <span class="dmethod">4M</span>, all of the baselines employed data augmentations to achieve their results.
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-hoverable table-row-active-background-color=hsl(0%, 100%, 41%)" align="center">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Training<br>data<br></th>
+                <th>Data<br>aug.<br></th>
+                <th>Extra<br>labels<br></th>
+                <th class="has-text-centered">ImageNet-1K<br>(Top 1 acc. ↑)<br></th>
+                <th class="has-text-centered" colspan="2">COCO<br>(AP<sup>box</sup> & AP<sup>mask</sup> ↑)<br></th>
+                <th class="has-text-centered">ADE20K<br>(mIoU ↑)<br></th>
+                <th class="has-text-centered">Depth<br>(δ<sub>1</sub> acc. ↑)<br></th>
+                <th class="has-text-centered">ARKS<br>(AP<sup>3D</sup> ↑)<br></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MAE B</td>
+                <td>IN-1K</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">84.2</td>
+                <td class="has-text-centered">48.3</td>
+                <td class="has-text-centered">41.6</td>
+                <td class="has-text-centered">46.1</td>
+                <td class="has-text-centered">89.1</td>
+                <td class="has-text-centered">30.9</td>
+              </tr>
+              <tr>
+                <td>DeiT III B</td>
+                <td>IN-21K</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">85.4</td>
+                <td class="has-text-centered">46.1</td>
+                <td class="has-text-centered">38.5</td>
+                <td class="has-text-centered">49.0</td>
+                <td class="has-text-centered">87.4</td>
+                <td class="has-text-centered">36.1</td>
+              </tr>
+              <tr>
+                <td>MultiMAE B</td>
+                <td>IN-1K</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">84.0</td>
+                <td class="has-text-centered">44.1</td>
+                <td class="has-text-centered">37.8</td>
+                <td class="has-text-centered">46.2</td>
+                <td class="has-text-centered">89.0</td>
+                <td class="has-text-centered">34.2</td>
+              </tr>
+              <tr>
+                <td><span class="dmethod">4M B</span> (RGB → RGB only)</td>
+                <td>CC12M</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">82.8</td>
+                <td class="has-text-centered">42.3</td>
+                <td class="has-text-centered">36.6</td>
+                <td class="has-text-centered">38.3</td>
+                <td class="has-text-centered">80.4</td>
+                <td class="has-text-centered">-</td>
+              </tr>
+              <tr>
+                <td><span class="dmethod">4M B</span> (RGB → CLIP only)</td>
+                <td>CC12M</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">83.4</td>
+                <td class="has-text-centered">46.6</td>
+                <td class="has-text-centered">39.9</td>
+                <td class="has-text-centered">43.0</td>
+                <td class="has-text-centered">85.7</td>
+                <td class="has-text-centered">-</td>
+              </tr>
+              <tr>
+                <td>DINOv2 B</td>
+                <td>LVD142M</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">85.3</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">51.6</td>
+                <td class="has-text-centered">92.2</td>
+                <td class="has-text-centered">38.1</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 B</span></td>
+                <td>CC12M</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">84.5</td>
+                <td class="has-text-centered">49.7</td>
+                <td class="has-text-centered">42.7</td>
+                <td class="has-text-centered">50.1</td>
+                <td class="has-text-centered">92.0</td>
+                <td class="has-text-centered">40.3</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 B</span></td>
+                <td>COYO</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">84.4</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">49.4</td>
+                <td class="has-text-centered">91.4</td>
+                <td class="has-text-centered">38.6</td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 B</span></td>
+                <td>CC12M+COYO+C4</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">84.5</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">50.1</td>
+                <td class="has-text-centered">90.8</td>
+                <td class="has-text-centered">42.4</td>
+              </tr>
+              <tr>
+                <td>MAE L</td>
+                <td>IN-1K</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">86.8</td>
+                <td class="has-text-centered">52.8</td>
+                <td class="has-text-centered">45.3</td>
+                <td class="has-text-centered">51.8</td>
+                <td class="has-text-centered">93.6</td>
+                <td class="has-text-centered">36.2</td>
+              </tr>
+              <tr>
+                <td>DeiT III L</td>
+                <td>IN-21K</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">87.0</td>
+                <td class="has-text-centered">48.7</td>
+                <td class="has-text-centered">41.1</td>
+                <td class="has-text-centered">52.0</td>
+                <td class="has-text-centered">89.6</td>
+                <td class="has-text-centered">40.3</td>
+              </tr>
+              <tr>
+                <td>DINOv2 L</td>
+                <td>LVD142M</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered">86.7</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">53.4</td>
+                <td class="has-text-centered">94.1</td>
+                <td class="has-text-centered">42.8</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 L</span></td>
+                <td>CC12M</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">86.6</td>
+                <td class="has-text-centered"><b><u>53.7</u></b></td>
+                <td class="has-text-centered"><b><u>46.4</u></b></td>
+                <td class="has-text-centered">53.4</td>
+                <td class="has-text-centered">94.4</td>
+                <td class="has-text-centered">46.8</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 L</span></td>
+                <td>COYO</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">86.7</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">53.5</td>
+                <td class="has-text-centered">94.3</td>
+                <td class="has-text-centered">45.2</td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 L</span></td>
+                <td>CC12M+COYO+C4</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">86.5</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">53.4</td>
+                <td class="has-text-centered">93.7</td>
+                <td class="has-text-centered">47.0</td>
+              </tr>
+
+              <tr>
+                <td>DINOv2 g</td>
+                <td>LVD142M</td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><b><u>88.0</u><b></td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered"><b><u>58.7</u><b></td>
+                <td class="has-text-centered">92.5</td>
+                <td class="has-text-centered">45.3</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 XL</span></td>
+                <td>CC12M</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">87.0</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">55.0</td>
+                <td class="has-text-centered">96.1</td>
+                <td class="has-text-centered">48.1</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 XL</span></td>
+                <td>COYO</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">87.1</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">56.1</td>
+                <td class="has-text-centered"><b><u>96.5</u><b></td>
+                <td class="has-text-centered">47.3</td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 XL</span></td>
+                <td>CC12M+COYO+C4</td>
+                <td class="has-text-centered"><i class="fas fa-times"></i></td>
+                <td class="has-text-centered"><i class="fas fa-check"></i></td>
+                <td class="has-text-centered">87.1</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">-</td>
+                <td class="has-text-centered">56.0</td>
+                <td class="has-text-centered"><b><u>96.5</u><b></td>
+                <td class="has-text-centered"><b><u>48.4</u><b></td>
+              </tr>
+            </tbody>
+            </table>
+        </div>
+
+        <br/>
+
+        <a class="anchor" id="multimodal-transfers"></a>
+        <h3 class="title is-4">Multimodal transfers</h3>
+        <div class="content has-text-justified">
+          <p>
+            We perform multimodal transfers on NYUv2, Hypersim semantic segmentation, and 3D object detection on ARKitScenes.
+            We compare transfers using RGB images only, and RGB pixels + tokenized sensory depth as inputs.
+            As shown below, <span class="dmethod">4M</span> makes strong use of optionally available depth inputs and significantly improves upon RGB-only input.
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-hoverable table-row-active-background-color=hsl(0%, 100%, 41%)" align="center">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="has-text-centered" colspan="2">NYUv2-S<br>(mIoU ↑)<br></th>
+                <th class="has-text-centered" colspan="2">Hypersim<br>(mIoU ↑)<br></th>
+                <th class="has-text-centered" colspan="2">ARKitScenes<br>(AP<sup>3D</sup> ↑)<br></th>
+              </tr>
+              <tr>
+                <th>Method</th>
+                <th>RGB</th>
+                <th>RGB-Depth</th>
+                <th>RGB</th>
+                <th>RGB-Depth</th>
+                <th>RGB</th>
+                <th>RGB-Depth</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 B</span></td>
+                <td class="has-text-centered">56.6</td>
+                <td class="has-text-centered">57.5</td>
+                <td class="has-text-centered">40.2</td>
+                <td class="has-text-centered">43.9</td>
+                <td class="has-text-centered">40.3</td>
+                <td class="has-text-centered">46.5</td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 B</span></td>
+                <td class="has-text-centered">58.7</td>
+                <td class="has-text-centered">59.7</td>
+                <td class="has-text-centered">38.6</td>
+                <td class="has-text-centered">46.4</td>
+                <td class="has-text-centered">42.4</td>
+                <td class="has-text-centered">48.1</td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 L</span></td>
+                <td class="has-text-centered">61.2</td>
+                <td class="has-text-centered">61.4</td>
+                <td class="has-text-centered"><b>48.7</b></td>
+                <td class="has-text-centered">50.5</td>
+                <td class="has-text-centered">46.8</td>
+                <td class="has-text-centered">49.5</td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 L</span></td>
+                <td class="has-text-centered">61.8</td>
+                <td class="has-text-centered"><u>61.8</u></td>
+                <td class="has-text-centered">47.3</td>
+                <td class="has-text-centered">50.7</td>
+                <td class="has-text-centered">47.0</td>
+                <td class="has-text-centered"><u>50.1</u></td>
+              </tr>
+              <tr class="is-selected fm7-selected">
+                <td><span class="dmethod">4M-7 XL</span></td>
+                <td class="has-text-centered"><u>62.1</u></td>
+                <td class="has-text-centered">61.2</td>
+                <td class="has-text-centered"><u>48.6</u></td>
+                <td class="has-text-centered"><u>51.0</u></td>
+                <td class="has-text-centered"><u>48.1</u></td>
+                <td class="has-text-centered"><u>50.1</u></td>
+              </tr>
+              <tr class="is-selected fm21-selected">
+                <td><span class="dmethod">4M-21 XL</span></td>
+                <td class="has-text-centered"><b>63.9</b></td>
+                <td class="has-text-centered"><b>63.9</b></td>
+                <td class="has-text-centered"><u>48.6</u></td>
+                <td class="has-text-centered"><b>52.5</b></td>
+                <td class="has-text-centered"><b>48.4</b></td>
+                <td class="has-text-centered"><b>51.3</b></td>
+              </tr>
+            </tbody>
+            </table>
+        </div>
+
+        <br>
+
+        <a class="anchor" id="ablations"></a>
+        <h3 class="title is-4">Ablations</h3>
+        <div class="content has-text-justified">
+          <p>
+            We perform an extensive ablation study to understand key design choices of
+            <span class="dmethod">4M</span> training, including what modalities to pre-train on,
+            how to sample from them for the multimodal masking scheme, and how many input and
+            output tokens should be used. We measure the effect of different design choices by
+            transferring the trained models to a diverse set of downstream tasks and reporting the
+            average loss. We note that training <span class="dmethod">4M</span> on all modalities as
+            both inputs and targets results in a generalist model that transfers best to novel tasks and
+            modalities on average.
+            Please see our <a href="#publications">NeurIPS paper appendix</a> for further ablations.
+          </p>
+        </div>
+
+        <div class="columns is-centered">
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Training inputs & targets (Avg. Loss ↓)</h3>
+            <canvas id="barChartAblationRGB2X" height="150"></canvas>
+          </div>
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Training inputs & targets (Avg. Loss ↓)</h3>
+            <canvas id="barChartAblationAll2X" height="150"></canvas>
+          </div>
+        </div>
+
+        <div class="columns is-centered">
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Input ɑ & Target ɑ (Avg. Loss ↓)</h3>
+            <canvas id="barChartAblationAlphas" height="200"></canvas>
+          </div>
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Input Tokens (Avg. Loss ↓)</h3>
+            <canvas id="barChartAblationInputTokens" height="200"></canvas>
+          </div>
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Target Tokens (Avg. Loss ↓)</h3>
+            <canvas id="barChartAblationTargetTokens" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="content has-text-justified">
+          <p>
+            We further show promising scaling trends in terms of dataset size, training duration,
+            and model size.
+          </p>
+        </div>
+
+        <div class="columns is-centered">
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Dataset Size (Avg. Loss ↓)</h3>
+            <canvas id="barChartScalingDataset" height="200"></canvas>
+          </div>
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Train Tokens (Avg. Loss ↓)</h3>
+            <canvas id="barChartScalingTokens" height="200"></canvas>
+          </div>
+          <div class="column has-text-centered ablation">
+            <h3 class="title is-5">Model Size (Avg. Loss ↓)</h3>
+            <canvas id="barChartScalingModel" height="200"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+</section>
+<!--/ Transfers -->
+
+<hr>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Acknowledgements</h2>
+    <div class="content has-text-justified">
+      <p>
+        We thank Elmira Amirloo Abolfathi, Andrei Atanov, Hanlin Goh, Yuri Gorokhov,
+        Kimi Huang, Javier Movellan, Hosna Oyarhoseini, Fernando Serrano Garcia,
+        Feng Tang, and Qian Zhou for their help with the project.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is based on the
+            <a href="https://github.com/nerfies/nerfies.github.io" target="_blank">Nerfies website template</a>,
+            which is licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
