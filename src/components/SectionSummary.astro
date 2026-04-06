@@ -1,0 +1,88 @@
+---
+// Section summary component
+---
+
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" id="about">Summary</h2>
+        <div class="content has-text-justified">
+          <p>
+            Long-context reasoning requires accurately identifying relevant information in extensive, noisy input contexts.
+            In this work, we propose <span class="dmethod">PERK</span>
+            (<strong>P</strong>arameter <strong>E</strong>fficient <strong>R</strong>easoning over <strong>K</strong>nowledge),
+            a scalable approach for learning to encode long input contexts using gradient updates to a lightweight model adapter at test time.
+            Specifically, <span class="dmethod">PERK</span> employs two nested optimization loops in a meta-training phase.
+            The inner loop rapidly encodes contexts into a low-rank adapter (LoRA) that serves as a parameter-efficient memory module for the base model.
+            Concurrently, the outer loop learns to use the updated adapter to accurately recall and reason over relevant information from the encoded long context.
+          </p>
+
+          <p>
+            Our evaluations on several long-context reasoning tasks show that <span class="dmethod">PERK</span> significantly outperforms the standard long-context finetuning, achieving average absolute performance gains of up to 20% for Qwen-2.5 (0.5B & 7B) on synthetic and real-world long-context reasoning. <span class="dmethod">PERK</span> also maintains its advantages across model scales and families. Compared to specialized long-context LLMs, <span class="dmethod">PERK</span> matches or surpasses their performance. Finally, our analyses show <span class="dmethod">PERK</span> is more robust to reasoning complexity, length extrapolation, and the positions of relevant information in contexts.
+          </p>
+
+          <!-- <p>
+            Through experimental analyses, we demonstrate the potential of <span class="dmethod">4M</span> for
+            training versatile and scalable foundation models for vision tasks, setting the stage for further
+            exploration in multimodal learning for vision and other domains. Please see our
+            <a href="https://github.com/apple/ml-4m/" target="_blank">
+              <span class="dlink">GitHub repository</span>
+            </a>
+            for code and pre-trained models.
+          </p> -->
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Overview. -->
+    <div class="extended-container columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">Overview</h2>
+
+        <div class="tile is-ancestor is-centered">
+          <div class="tile is-parent">
+            <a href="#method" class="tile is-child box asdf">
+              <p class="title is-5"><span class="dmethod">PERK</span> Method Overview</p>
+              <p>
+                Discover <span class="dmethod">PERK</span>&apos;s meta-learning algorithm for long-context reasoning.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#long-context-eval" class="tile is-child box">
+              <p class="title is-5">Long-Context Reasoning</p>
+              <p>
+                Check out <span class="dmethod">PERK</span>&apos;s performance on a variety of long-context reasoning benchmarks.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#robustness-analysis" class="tile is-child box">
+              <p class="title is-5">Robustness Analysis</p>
+              <p>
+                <span class="dmethod">PERK</span> can do
+                (1) test-time length generalization (both shorter and longer than the training length), and is
+                (2) robust to the position of relevant information in the context.
+              </p>
+            </a>
+          </div>
+
+          <div class="tile is-parent">
+            <a href="#efficiency-analysis" class="tile is-child box">
+              <p class="title is-5">Efficiency Analysis</p>
+              <p>
+                <span class="dmethod">PERK</span> scales more efficiently in memory and runtime on extremely long contexts.
+              </p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Overview. -->
+  </div>
+</section>

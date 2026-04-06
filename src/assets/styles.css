@@ -1,0 +1,109 @@
+:root {
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --border-color: #dee2e6;
+}
+
+[data-theme="dark"] {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --border-color: #333333;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Dark mode for specific components */
+[data-theme="dark"] .container,
+[data-theme="dark"] .section,
+[data-theme="dark"] .content,
+[data-theme="dark"] .subtitle,
+[data-theme="dark"] .title {
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .mod-figure {
+  border-color: var(--border-color);
+}
+
+/* Dark mode for images */
+[data-theme="dark"] img {
+  filter: brightness(0.8);
+}
+
+/* Dark mode for links */
+[data-theme="dark"] a {
+  color: var(--primary-color);
+}
+
+/* Dark mode for buttons */
+[data-theme="dark"] .button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Dark mode for code blocks */
+[data-theme="dark"] pre {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+/* Dark mode for tables */
+[data-theme="dark"] table {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] th,
+[data-theme="dark"] td {
+  border-color: var(--border-color);
+}
+
+/* Dark mode for cards/boxes */
+[data-theme="dark"] .box {
+  background-color: #2d2d2d;
+  border-color: var(--border-color);
+}
+
+/* Dark mode for navigation */
+[data-theme="dark"] .navbar {
+  background-color: #1a1a1a;
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .navbar-item,
+[data-theme="dark"] .navbar-link {
+  color: var(--text-color);
+}
+
+/* Dark mode for footer */
+[data-theme="dark"] .footer {
+  background-color: #1a1a1a;
+  border-top-color: var(--border-color);
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.2rem;
+}
+
+.theme-toggle:hover {
+  color: var(--primary-color);
+}
+
+.theme-toggle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}

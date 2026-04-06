@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Base title="PERK Paper - arXiv 2512">
+  <Navbar />
+
+  <section class="section pdf-viewer-section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-12">
+          <h1 class="title is-2 has-text-centered">
+            <span class="dmethod">PERK</span>: Long-Context Reasoning as Test-Time Learning
+          </h1>
+          <p class="subtitle has-text-centered">
+            <a href="/static/pdf/perk_arxiv_2512.pdf" download class="button is-link is-outlined">
+              <span class="icon">
+                <i class="fas fa-download"></i>
+              </span>
+              <span>Download PDF</span>
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <div class="pdf-container">
+        <embed
+          src="/static/pdf/perk_arxiv_2512.pdf"
+          type="application/pdf"
+          width="100%"
+          height="100%"
+        />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .pdf-viewer-section {
+    padding-top: 5rem;
+    min-height: 100vh;
+  }
+
+  .pdf-container {
+    width: 100%;
+    height: calc(100vh - 200px);
+    min-height: 600px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .pdf-container embed {
+    display: block;
+  }
+
+  .title .dmethod {
+    color: #e74c3c;
+    font-weight: 700;
+  }
+</style>

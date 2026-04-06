@@ -1,0 +1,224 @@
+---
+// Section robustness analysis component
+---
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="robustness-analysis"></a>
+        <h2 class="title is-3">Robustness Analysis</h2>
+
+        <a class="anchor" id="length-robustness"></a>
+        <h3 class="title is-4">Robusetness to Unseen Test-Time Lengths</h3>
+        <div class="content has-text-justified">
+          <p>
+            We evaluate <span class="dmethod">PERK</span>&apos;s robustness to inputs of different lengths than those seen in training.
+            We test for both <em>shorter</em> and <em>longer</em> test-time lengths than the training length.
+            We evaluate using the BabiLong tasks and train a Qwen-2.5-0.5B model using <span class="dmethod">PERK</span> on fixed-length contexts ranging from 1K to 8K tokens.
+            We evaluate each model on contexts ranging from 1K to 32K tokens, measuring each approach's ability to generalize to unseen lengths.
+          </p>
+        </div>
+
+        <div class="figure-container" style="width: 60%; margin: 0 auto;">
+          <figure class="image mod-figure">
+            <img src="/static/images/length-generalization_updated.png" alt="test-time length extrapolation">
+          </figure>
+          <div class="table-caption">
+            <strong>Robusetness to unseen test-time lengths</strong> on BabiLong <strong>QA1 (a)</strong> and <strong>QA2 (b)</strong>
+            comparison between <span class="highlight-text">PERK (Ours)</span> and FT-ICR on the Qwen-2.5-0.5B model.
+            The y-axis represents the training context lengths, while the x-axis indicates various test-time context lengths.
+            Bordered cells denote the boundary: evaluation on context lengths equal to those in training.
+            <strong><span class="highlight-text">PERK (Ours)</span> shows stronger robustness to unseen test-time lengths.</strong>
+          </div>
+        </div>
+        <br/>
+
+        <strong>On longer test-time lengths:</strong> FT-ICR's performance drops drastically as the inference context length exceeds the training context length,
+        especially for models trained on shorter contexts.
+        While <span class="dmethod">PERK</span>&apos;s accuracy also decreases (from a higher starting point), the degradation is dampened at longer test lengths.
+
+        <br/><br/>
+
+        <strong>On shorter test-time lengths:</strong> FT-ICR continues to lose performance on shorter contexts when finetuned on longer ones,
+        matching observations from <a href="https://arxiv.org/abs/2410.02660" target="_blank">Gao et al. (2025)</a>.
+        In contrast, <span class="dmethod">PERK</span> maintains its performance and even increases performance for QA2.
+
+        <br/><br/>
+
+        <h4 class="title is-5">PERK generalizes to long context lengths beyond the context window.</h4>
+
+        <div class="extrapolation-table-container" style="width: 85%; margin: 0 auto;">
+          <table class="scientific-table">
+            <thead>
+              <tr class="top-rule">
+                <th rowspan="2" class="model-col">Model</th>
+                <th colspan="3" class="group-header">(a) Single-hop reasoning</th>
+                <th colspan="3" class="group-header">(b) Two-hop reasoning</th>
+              </tr>
+              <tr class="mid-rule">
+                <th class="context-col">32K</th>
+                <th class="context-col">64K</th>
+                <th class="context-col">128K</th>
+                <th class="context-col">32K</th>
+                <th class="context-col">64K</th>
+                <th class="context-col">128K</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Group 1 -->
+              <tr class="section-divider">
+                <td colspan="7" style="font-size: 0.9rem;">Commercial Frontier Models</td>
+              </tr>
+              <tr>
+                <td class="model-name">GPT-4.1</td>
+                <td>87.8</td>
+                <td>78.7</td>
+                <td>69.4</td>
+                <td>80.6</td>
+                <td class="best-score">66.4</td>
+                <td class="best-score">48.2</td>
+              </tr>
+              <tr>
+                <td class="model-name">Gemini-1.5-pro</td>
+                <td>87.7</td>
+                <td>82.3</td>
+                <td class="best-score">73.1</td>
+                <td>56.4</td>
+                <td>48.8</td>
+                <td>40.2</td>
+              </tr>
+
+              <!-- Group 2 -->
+              <tr class="section-divider">
+                <td colspan="7" style="font-size: 0.9rem;">Trained on contexts with &gt;256K tokens</td>
+              </tr>
+              <tr>
+                <td class="model-name">Qwen2.5-7B-Instruct-1M</td>
+                <td>65.7</td>
+                <td>30.3</td>
+                <td>21.4</td>
+                <td>35.3</td>
+                <td>21.0</td>
+                <td>12.2</td>
+              </tr>
+              <tr>
+                <td class="model-name">ProLong-8B-Instruct-512K</td>
+                <td>41.0</td>
+                <td>33.2</td>
+                <td>24.3</td>
+                <td>29.0</td>
+                <td>18.5</td>
+                <td>17.7</td>
+              </tr>
+
+              <!-- Group 3 -->
+              <tr class="section-divider">
+                <td colspan="7" style="font-size: 0.9rem;">Trained on contexts with 8K tokens (Length Extrapolation)</td>
+              </tr>
+              <tr>
+                <td class="model-name">FT-ICR (Qwen2.5-0.5B)</td>
+                <td>43.8</td>
+                <td>34.5</td>
+                <td class="zero-score">0.0</td>
+                <td>39.4</td>
+                <td>11.7</td>
+                <td class="zero-score">0.0</td>
+              </tr>
+              <tr>
+                <td class="model-name indent">+ Yarn + DCA</td>
+                <td>59.2</td>
+                <td>35.5</td>
+                <td>25.4</td>
+                <td>42.5</td>
+                <td>26.3</td>
+                <td>18.5</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="model-name"><strong>PERK</strong> (Ours)</td>
+                <td class="best-score">95.3</td>
+                <td class="best-score">88.9</td>
+                <td>61.4</td>
+                <td class="best-score">80.9</td>
+                <td>62.5</td>
+                <td>44.4</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="table-caption">
+            <strong>Table 1: Test-time length extrapolation beyond 32K on BabiLong.</strong>
+            Both PERK and FT-ICR are trained on 8K sequences.
+            <span class="highlight-text">PERK (Ours)</span> demonstrates superior extrapolation capabilities compared to standard fine-tuning and specialized attention methods.
+          </div>
+        </div>
+
+        <br/>
+
+        <div class="content has-text-justified">
+          <p>
+            To stress-test the limit of <span class="dmethod">PERK</span>'s length extrapolation ability,
+            we further test on sequences with context lengths beyond the context window of the Qwen-2.5 model -- 32K tokens.
+            Specifically, we test on sequences with 64K and 128K tokens.
+            <br><br>
+
+            We show that <span class="dmethod">PERK</span> consistently achieves
+            <strong>stronger length-extrapolation performance</strong> than the supervisely finetuned model.
+            Although with 128K tokens, <span class="dmethod">PERK</span>'s accuracy experiences a noticeable drop to 61.4% for QA1 and 44.4% for QA2,
+            these scores are still substantially better than the 0% absolute performance of the supervisely finetuned model.
+            <br><br>
+
+            When we apply the SOTA length generalization methods, <a href="https://arxiv.org/abs/2309.00071" target="_blank">Yarn</a> and <a href="https://arxiv.org/abs/2501.15383" target="_blank">DCA</a>, to FT-ICR Qwen,
+            the baselines show improved generalization on the extreme contexts.
+            However, Yarn + DCA's extrapolation performance is still far below <span class="dmethod">PERK</span> for both QA1 and QA2 (around 35% lower on average).
+            <br><br>
+
+            Compared to the specialized frontier models, <span class="dmethod">PERK</span> outperforms Gemini-1.5-pro and the two open-source models, and achieves a narrow performance gap to GPT-4.1 on both 64K and 128K contexts. We note, as well, that <span class="dmethod">PERK</span> is only trained on contexts with 8K tokens, while the <a href="https://arxiv.org/abs/2501.15383" target="_blank">Qwen-1M</a> and <a href="https://arxiv.org/abs/2410.02660" target="_blank">ProLong-512K</a> models have been trained on much longer contexts (> 256K tokens).
+          </p>
+        </div>
+
+        <br/>
+
+        <a class="anchor" id="positional-biases"></a>
+        <h3 class="title is-4">Robustness to Positional Biases</h3>
+
+        <div class="content has-text-justified text-wrap-container">
+          <div class="figure-float-right">
+            <figure class="image mod-figure" style="width: 80%; margin: 0 auto;">
+              <img src="/static/images/positional_bias_v2.png" alt="positional bias">
+            </figure>
+            <div class="table-caption">
+              <strong>Positional Bias</strong> Comparison of <span class="highlight-text">PERK (Ours)</span> and FT‑ICR on 4K & 8K contexts, on Qwen‑2.5‑0.5B.
+              We train on problems where the relevant information appears in the beginning (<strong>Pre</strong>), middle (<strong>Mid</strong>),
+              or end (<strong>Post</strong>) of the context, and evaluate on all three positions.
+              We also train models on contexts where the relevant information is randomly located (<strong>Rnd</strong>),
+              testing on all four positional settings (<strong>Pre</strong>, <strong>Post</strong>, <strong>Mid</strong>, <strong>Rnd</strong>).
+              Bordered cells show in-distribution performances.
+              <strong><span class="highlight-text">PERK (Ours)</span> demonstrates strong positional robustness.</strong>
+            </div>
+          </div>
+
+          <p>
+            Prior work has shown that the position of relevant information in long contexts affects a language model's ability to utilize that information.
+            We test <span class="dmethod">PERK</span>&apos;s robustness to positional biases by evaluating its test-time performance on contexts
+            where the position of relevant information is distributed differently from those seen in training.
+          </p>
+
+          <h4 class="title is-5">PERK is robust to information positions.</h4>
+          <p>
+            When trained on contexts with relevant documents randomly located (<strong>Rnd</strong>) throughout the context,
+            <span class="dmethod">PERK</span> outperforms FT-ICR.
+            FT-ICR shows large performance drops when the relevant document appears at different locations
+            (<strong>Pre</strong>, <strong>Mid</strong>, and <strong>Post</strong>) at test time.
+            Meanwhile, shifting relevant positions at test-time shows minimal effect (within 1-2%) on <span class="dmethod">PERK</span>.
+          </p>
+
+          <p>
+            To further stress-test positional generalization, we also force relevant documents into particular positions during training and testing with positions across the full context.
+            We find that FT-ICR easily overfits to the position pattern, completely failing to generalize to test-time position changes (performance drops to close to 0% when the position shifts at test time).
+          </p>
+
+      </div>
+    </div>
+  </div>
+</section>

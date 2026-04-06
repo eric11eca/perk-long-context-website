@@ -1,0 +1,227 @@
+/**
+ * Scientific Elements Styles
+ * Shared styles for scientific tables, figures, and captions
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   Scientific Table Container
+   ========================================================================== */
+
+.extrapolation-table-container {
+  font-family: 'Inter', -apple-system, sans-serif;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 20px;
+  background: #ffffff;
+}
+
+/* ==========================================================================
+   Scientific Table Base Styles
+   ========================================================================== */
+
+.scientific-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #1a202c;
+  border-bottom: 2px solid #1a202c; /* bottomrule */
+}
+
+/* Header Styles */
+.scientific-table thead th {
+  padding: 12px 8px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.top-rule {
+  border-top: 2px solid #1a202c; /* toprule */
+}
+
+.mid-rule {
+  border-bottom: 1px solid #718096; /* midrule */
+}
+
+.group-header {
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: #4a5568;
+}
+
+/* Body Styles */
+.scientific-table td {
+  padding: 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.scientific-table .model-name {
+  text-align: left;
+  padding-left: 10px;
+  font-weight: 500;
+  color: #2d3748;
+  border-right: 1px solid #edf2f7;
+}
+
+.scientific-table .indent {
+  padding-left: 25px;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+/* Section Dividers */
+.section-divider td {
+  background: #f8fafc;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: center;
+  padding: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ==========================================================================
+   Score Highlights
+   ========================================================================== */
+
+.best-score {
+  color: #059669; /* Emerald 600 */
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.zero-score {
+  color: #e11d48; /* Rose 600 */
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   Highlight Row (for showcasing method)
+   ========================================================================== */
+
+.highlight-row {
+  background-color: #f0f9ff !important; /* Light blue tint */
+}
+
+.highlight-row td {
+  border-bottom: 1px solid #bae6fd;
+}
+
+/* Vertical divider between task groups */
+.scientific-table td:nth-child(4),
+.scientific-table th:nth-child(2) {
+  border-right: 1px solid #edf2f7;
+}
+
+/* ==========================================================================
+   Figure Container
+   ========================================================================== */
+
+.figure-container {
+  margin: 1.5rem auto;
+}
+
+.figure-container .image {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Table & Figure Captions
+   ========================================================================== */
+
+.table-caption {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4a5568;
+  text-align: left;
+  border-left: 3px solid #cbd5e0;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+.table-caption strong {
+  color: #2d3748;
+}
+
+.table-caption em {
+  color: #64748b;
+}
+
+.highlight-text {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Text Wrap Around Figure
+   ========================================================================== */
+
+.text-wrap-container {
+  overflow: hidden; /* Clear floats */
+}
+
+.figure-float-right {
+  float: right;
+  width: 48%;
+  margin: 0 0 1.5rem 2rem;
+}
+
+.figure-float-right .image {
+  margin: 0;
+}
+
+.figure-float-right .table-caption {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.figure-float-left {
+  float: left;
+  width: 48%;
+  margin: 0 2rem 1.5rem 0;
+}
+
+.figure-float-left .image {
+  margin: 0;
+}
+
+.figure-float-left .table-caption {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .scientific-table {
+    font-size: 0.75rem;
+  }
+
+  .extrapolation-table-container {
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .table-caption {
+    font-size: 0.85rem;
+    padding-left: 12px;
+  }
+
+  .figure-container {
+    width: 95% !important;
+  }
+
+  .figure-float-right,
+  .figure-float-left {
+    float: none;
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+}

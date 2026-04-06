@@ -1,0 +1,79 @@
+---
+// Section method component
+---
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="method"></a>
+        <h2 class="title is-3"><span class="dmethod">PERK</span> method overview</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            To scale the training of larger and more capable test-time learning models,
+            we propose <span class="dmethod">PERK</span>,
+            which uses a parameter-efficient test-time adaptation to reduce
+            both the size and amount of gradient unrolling required during optimization.
+            Specifically, in the inner and outer loops,
+            we only optimize a parameter-efficient adapter,
+            <strong>LoRA</strong>, to encode the contexts, and we apply <i>truncated gradient unrolling</i>
+            to reduce the memory cost of backpropagating through the inner loop.
+          </p>
+        </div>
+
+        <a class="anchor" id="inner-loop-training"></a>
+        <h2 class="title is-4">Test-Time Learning and Inner Loop Training</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We set the test time learning objective (thus also the inner loop objective) to Causal Language Modeling (CLM) of the context,
+            and set the adaptation algorithm $Alg$ to only update the LoRA parameters.
+            The adaptation algorithm computes the gradients on a batch of sub-sequences from the full context sequence.
+            This compression as a parallel <i>batch</i>(or multiple batches) allows us to process lengthy sequences
+            beyond the model&apos;s context window.
+          </p>
+        </div>
+
+        <div class="figure-container">
+          <figure class="image">
+            <img src="/static/images/perk_training.png" alt="PERK train figure."/>
+          </figure>
+          <div class="table-caption">
+            <strong>Meta-learning PERK for long-context reasoning:</strong>
+            We meta-learn <span class="highlight-text">PERK (Ours)</span> with a nested inner and outer loop.
+            The inner loop optimizes the likelihood of a long context segment with respect to the parameters of the LoRA-based memory scratchpad.
+            In the outer loop, the model uses the encoded information in the memory scratchpad to answer questions.
+            In both cases, only the memory parameters are updated while the base LLM parameters are frozen.
+          </div>
+        </div>
+
+        <a class="anchor" id="outer-loop-training"></a>
+        <h2 class="title is-4">Outer Loop Training</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            In the outer loop, we optimize the meta parameters of the LoRA module to learn from the corresponding distribution of reasoning problems.
+            The optimal meta parameters minimize the expected reasoning loss of the adapter&apos;s adaptation to each reasoning problem,
+            where the adaptation here is the parameter-efficient CLM adaptation of the LoRA meta parameters to the context.
+            The outer loop then trains the model to answer questions using only the information stored in the updated adapter without access to the original text. This meta-learning approach teaches the model not just what to remember, but how to remember effectively.
+          </p>
+        </div>
+
+        <a class="anchor" id="truncated-gradient-unrolling"></a>
+        <h2 class="title is-4">Truncated Gradient Unrolling (TGU)</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            To make this computationally tractable, PERK employs truncated gradient unrolling.
+            Rather than backpropagating through every step of the inner loop optimization (which would be prohibitively expensive),
+            PERK only retains the computation graph for the final few adaptation steps.
+            In particular, we run the inner loop optimization for all $N$ specified update steps, but only store the computational graph for the last $T \leq N$ steps.
+            This approximation reduces memory requirements dramatically while maintaining performance.
+
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

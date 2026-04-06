@@ -1,0 +1,46 @@
+---
+// Section efficiency analysis component
+---
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="efficiency-analysis"></a>
+        <h2 class="title is-3">Efficiency Analysis</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We evaluate <span class="dmethod">PERK</span>&apos;s training efficiency on long contexts by measuring its inference memory cost and run-time,
+            compared to in-context reasoning with supervisely finetuned models.
+          </p>
+        </div>
+
+        <div class="figure-container">
+          <figure class="image mod-figure" style="width: 80%; margin: 0 auto;">
+            <img src="/static/images/inference_efficiency_results.png" alt="test-time length extrapolation">
+          </figure>
+          <div class="table-caption">
+            <strong>Memory footprint and wall‑clock runtime during inference </strong> as context length increases (up to 128K tokens), comparing <span class="highlight-text">PERK (Ours)</span> with <span class="dmethod">FT-ICR</span>.
+            Curves that terminate before 128K indicate that the method failed with an OOM error at longer context lengths, preventing further measurement.
+            <strong><span class="highlight-text">PERK (Ours)</span> demonstrates more efficient scaling in both memory and runtime, particularly for extremely long sequences.</strong>
+          </div>
+        </div>
+
+        <br/>
+
+        <h3 class="title is-4">PERK scales more efficiently in memory and runtime on extremely long contexts</h3>
+
+        <div class="content has-text-justified">
+          <p>
+            <span class="dmethod">PERK</span> provides more efficient memory and runtime scaling for extremely long contexts compared to <span class="dmethod">FT-ICR</span>.
+            While <span class="dmethod">FT-ICR</span> is initially more efficient, its memory and runtime grow rapidly, leading to OOM errors at a context length of 128K.
+            In contrast, <span class="dmethod">PERK</span> can manage the long sequences through gradient accumulation, which, while increasing runtime, reduces the memory footprint.
+            Ultimately, at 128K tokens, where <span class="dmethod">FT-ICR</span> fails, <span class="dmethod">PERK</span> with 16 steps successfully processes the context using 35.2GB in 20.9s,
+            showing that <span class="dmethod">PERK</span> provides a practical path to handle extreme context lengths efficiently in both memory and runtime when compared to standard approaches.
+          </p>
+        </div>
+
+    </div>
+  </div>
+</section>

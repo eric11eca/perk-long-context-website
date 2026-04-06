@@ -1,0 +1,174 @@
+---
+// Section long context eval component
+---
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <a class="anchor" id="long-context-eval"></a>
+        <h2 class="title is-3">Long-Context Reasoning Evaluation</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            <span class="dmethod">PERK</span> demonstrates strong performance on long-context
+            reasoning tasks, significantly outperforming standard supervised finetuned
+            models with in-context reasoning (FT-ICR). We evaluate <span
+              class="dmethod">PERK</span
+            > in three challenging scenarios: (1) Needles-in-a-Haystack — Reasoning
+            with <a href="https://arxiv.org/abs/2406.10149" target="_blank"
+              >BabiLong</a
+            >, (2) Drops-in-an-Ocean (DIO), a novel evaluation setting we
+            propose, and (3) Multi-Doc QA with <a
+              href="https://hotpotqa.github.io/"
+              target="_blank">HotpotQA</a
+            > and <a
+              href="https://nlp.cs.washington.edu/triviaqa/"
+              target="_blank">TriviaQA</a
+            > for real-world long-context reasoning.
+          </p>
+        </div>
+
+        <div class="figure-container">
+          <figure class="image tok-figure">
+            <img
+              src="/static/images/long_context_results.png"
+              alt="Long context results"
+            />
+          </figure>
+          <div class="table-caption">
+            <strong
+              >Performance on NIAH with <a
+                href="https://arxiv.org/abs/2406.10149"
+                target="_blank">BabiLong</a
+              >, Multi-Doc QA with <a
+                href="https://hotpotqa.github.io/"
+                target="_blank">HotpotQA</a
+              > and <a
+                href="https://nlp.cs.washington.edu/triviaqa/"
+                target="_blank">TriviaQA</a
+              >, and DIO with Student Records.</strong
+            >
+            All models trained on 8K-token sequences, tested on 8K (in-distribution)
+            and 32K tokens (out-of-distribution). We report accuracy for NIAH and
+            DIO, and Sub-string Exact Match (SubEM) for Multi-Doc QA.
+          </div>
+        </div>
+
+        <a class="anchor" id="babilong-niah-reasoning"></a>
+        <h2 class="title is-4">
+          Needle-in-a-Haystack: Reasoning over Relevant Facts
+        </h2>
+        <div class="content has-text-justified">
+          <p>
+            We evaluate <span class="dmethod">PERK</span> on <a
+              href="https://arxiv.org/abs/2406.10149"
+              target="_blank">BabiLong</a
+            >, which hides critical facts ("needles") within thousands of tokens
+            of irrelevant text ("haystack"), then requires finding and reasoning
+            over those facts. We test three difficulty levels: single-hop (QA1),
+            two-hop (QA2), and three-hop (QA3) reasoning.
+          </p>
+          <p>
+            <span class="dmethod">PERK</span> outperforms all baselines across all
+            reasoning depths, including much larger models and specialized long-context
+            models supporting 512K–1M tokens.
+            <span class="dmethod">PERK</span> (Qwen-7B) achieves higher accuracy than
+            FT-ICR (Qwen-7B) at 8K contexts, and when extrapolating to 32K contexts,
+            <span class="dmethod">PERK</span> outperforms FT-ICR by 23 percentage
+            points on average.
+          </p>
+        </div>
+
+        <a class="anchor" id="multi-doc-qa"></a>
+        <h2 class="title is-4">Multi-Document Question Answering</h2>
+        <div class="content has-text-justified">
+          <p>
+            On <a href="https://hotpotqa.github.io/" target="_blank">HotpotQA</a
+            > and <a
+              href="https://nlp.cs.washington.edu/triviaqa/"
+              target="_blank">TriviaQA</a
+            >, which require retrieving and reasoning across multiple documents,
+            <span class="dmethod">PERK</span> (trained on 8K tokens) beats FT-ICR
+            by 15–20% depending on model size. When generalizing to 32K-token contexts
+            unseen during training, <span class="dmethod">PERK</span> maintains a
+            14–30% advantage.
+          </p>
+          <p>
+            Compared to specialized long-context models like <a
+              href="https://arxiv.org/abs/2501.15383"
+              target="_blank">Qwen-1M</a
+            >
+            and <a href="https://arxiv.org/abs/2410.02660" target="_blank"
+              >ProLong-512K</a
+            >,
+            <span class="dmethod">PERK</span> matches their performance with
+            far less specialized training. While GPT-4.1 and Gemini-1.5-pro still
+            lead, <span class="dmethod">PERK</span> significantly closes the gap.
+          </p>
+        </div>
+
+        <a class="anchor" id="drop-in-ocean-reasoning"></a>
+        <h2 class="title is-4">
+          Drops-in-an-Ocean: Stress-Testing with Similar Distractors
+        </h2>
+        <div class="content has-text-justified">
+          <p>
+            Standard NIAH datasets have a fundamental limitation: target
+            information often differs stylistically from surrounding text,
+            making retrieval artificially easy. We propose <strong
+              >Drops-in-the-Ocean</strong
+            > (DIO), which forms long contexts from structurally similar documents.
+
+            Our synthetic <strong>Student Records</strong> dataset simulates a database
+            with evaluation tasks of increasing complexity: (1) <strong
+              >Recall</strong
+            > (retrieve attributes for a student ID), (2) <strong
+              >Relation</strong
+            > (compare attributes between two IDs), and (3) <strong
+              >Aggregate</strong
+            > (max, min, and average grades).
+          </p>
+          <p>
+            <span class="dmethod">PERK</span> outperforms FT-ICR across all task difficulties
+            and context lengths, with a smaller performance drop at 32K tokens. The
+            performance gap widens monotonically with task difficulty, suggesting
+            <span class="dmethod">PERK</span> enhances complex reasoning rather than
+            merely improving retrieval. Both <span class="dmethod">PERK</span> variants
+            outperform specialized long-context models, and <span
+              class="dmethod">PERK</span
+            > (Qwen-7B) matches or exceeds commercial models even on Aggregate tasks.
+          </p>
+        </div>
+
+        <a class="anchor" id="model-family-generalization"></a>
+        <h2 class="title is-4">Model Family & Scale Generalization</h2>
+
+        <div class="figure-container">
+          <figure class="image tok-figure" style="width: 50%; margin: 0 auto;">
+            <img
+              src="/static/images/scale_and_models.png"
+              alt="Long context results"
+            />
+          </figure>
+          <div class="table-caption">
+            <strong>Performance across model families and scales:</strong>
+            <span class="dmethod">PERK</span> on BabiLong QA2 with 8K train & test
+            context length.
+            <span class="dmethod">PERK</span> consistently outperforms FT-ICR baselines
+            across models.
+          </div>
+        </div>
+
+        <div class="content has-text-justified">
+          <p>
+            <span class="dmethod">PERK</span> achieves strong performance across GPT-2,
+            Qwen-2.5 (0.5B & 7B), LLaMA-3.1-8B, and LLaMA-3.2-1B families and scales, demonstrating
+            that its advantages represent a fundamentally effective approach for long-context reasoning
+            rather than architecture-specific or scale-specific gains.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
